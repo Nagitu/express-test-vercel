@@ -1,7 +1,7 @@
 // index.js
 const express = require('express');
 const app = express();
-
+const { Pool } = require('pg');
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -12,6 +12,35 @@ let items = [
     { id: 1, name: 'Item 1', description: 'Description 1' },
     { id: 2, name: 'Item 2', description: 'Description 2' },
   ];
+
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+
+  app.get('/item', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM items');
+      res.json(result.rows);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+  
+  app.post('/item', async (req, res) => {
+    const { name, description } = req.body;
+    try {
+      const result = await pool.query(
+        'INSERT INTO items (name, description) VALUES ($1, $2) RETURNING *',
+        [name, description]
+      );
+      res.json(result.rows[0]);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
   
   // Create - Menambahkan item baru
   app.post('/items', (req, res) => {
