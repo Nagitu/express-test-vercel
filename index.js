@@ -14,7 +14,7 @@ let items = [
   ];
 
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: "postgres://default:6mWIXUZS5Jtl@ep-fragrant-salad-a1bjz4vb.ap-southeast-1.aws.neon.tech:5432/verceldb?sslmode=require",
     ssl: {
       rejectUnauthorized: false
     }
